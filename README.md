@@ -1,4 +1,4 @@
-# Project Title
+# EPoDx Dashboards
 
 This repository contains scripts that download learner data from [EPoDx](https://www.epodx.org) and upload it to
 dashboards that help instructors customize instruction as part of a blended learning experience. The EPoDx units were
