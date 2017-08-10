@@ -1,0 +1,7 @@
+# Specify intentionally untracked files to ignore
+
+# API secret token
+hks_secret_token.txt
+
+# Byte-compiled python files
+*.pyc
