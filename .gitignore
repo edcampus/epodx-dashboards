@@ -5,3 +5,9 @@ hks_secret_token.txt
 
 # Byte-compiled python files
 *.pyc
+
+# Condor log, error, and output files
+condor/
+
+# gedit backups
+*~
