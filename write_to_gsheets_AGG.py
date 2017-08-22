@@ -6,7 +6,7 @@ Program: Write to GSheets
 Programmer: Michael Fryar, Research Fellow, EPoD
 Date created: January 5, 2017
 
-Purpose: Write to Google Sheets via API. 
+Purpose: Write to Google Sheets via API.
 """
 # Note: Must first establish SSH connection to epodx analytics
 import requests
@@ -28,8 +28,14 @@ def write_to_sheet():
     """
 	Get learner profile information for course_id from epodx
 	"""
-	# The list of fields you've requested. Leave this parameter off to see 		the full list of fields.
-    fields = ','.join(["user_id", "username", "name", "email", "language", 				"location", "year_of_birth", "gender", "level_of_education", 				"mailing_address", "goals", "enrollment_mode", 				"segments", "cohort", "city", "country", "enrollment_date", 			"last_updated"])
+	# The list of fields you've requested. Leave this parameter off to see the
+    # full list of fields.
+    fields = ','.join(
+                    ["user_id", "username", "name", "email", "language",
+                    "location", "year_of_birth", "gender",
+                    "level_of_education", "mailing_address", "goals",
+                    "enrollment_mode", "segments", "cohort", "city",
+                    "country", "enrollment_date", "last_updated"])
 
     learner_profile_report_url = "http://localhost:18100/api/v0/learners/"
 
@@ -43,7 +49,8 @@ def write_to_sheet():
 			"fields": fields,
 	}
     with requests.Session() as s:
-        download = s.get(learner_profile_report_url, headers=headers, 							params=params)
+        download = s.get(learner_profile_report_url, headers=headers,
+                         params=params)
 
         decoded_content = download.content.decode('ascii', 'ignore')
 
@@ -68,7 +75,10 @@ def write_to_sheet():
 	"""
 	Building on quickstart template to try to write to Google Sheets.
 
-	Creates a Sheets API service object and writes learner profile information to Master Sheet: 		https://docs.google.com/spreadsheets/d/1uMAyKZYtoVLzqpknBxOGbkLjR7-AMqlEEowdFqSc3pw/edit
+	Creates a Sheets API service object and writes learner profile
+    information to Master Sheet. To open Master sheet go to:
+    https://docs.google.com/spreadsheets/d/<spreasheetId>/edit
+    plugging in value of <spreadsheetId> below.
 	"""
     http = credentials.authorize(httplib2.Http())
     discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
@@ -97,4 +107,3 @@ def write_to_sheet():
 if __name__ == '__main__':
 	credentials = get_credentials.get_credentials()
 	write_to_sheet()
-
