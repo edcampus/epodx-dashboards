@@ -13,7 +13,10 @@ import subprocess
 from write_to_gsheets_AGG import write_to_sheet
 
 # Change to directory containing configuration files
-os.chdir("C:/Users/mifryar/Documents/epodx")
+home_dir = os.path.expanduser('~')
+epodx_dir = os.path.join(home_dir, 'Documents/epodx')
+dashboards_dir = os.path.join(home_dir, 'Documents/epodx-dashboards')
+os.chdir(epodx_dir)
 
 # Establish ssh tunnel in background that auto-closes
 # -f "fork into background", -F "use configuration file"
