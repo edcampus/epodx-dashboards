@@ -1,16 +1,16 @@
-"""
-Program: Get Credentials
+"""Program: Get Credentials
 Programmer: Michael Fryar, Research Fellow, EPoD
 Date created: January 5, 2017
 
 Purpose: Gets OAuth2 credentials to allow interacting
-with Google Sheets via API. 
+with Google Sheets via API.
 """
 
 from __future__ import print_function
-import httplib2
+
 import os
 
+import httplib2
 from apiclient import discovery
 from oauth2client import client
 from oauth2client import tools
@@ -35,15 +35,15 @@ def get_credentials():
     If nothing has been stored, or if the stored credentials are invalid,
     the OAuth2 flow is completed to obtain the new credentials.
 
-    Returns:
-        Credentials, the obtained credential.
+    Returns: Credentials, the obtained credential.
     """
     home_dir = os.path.expanduser('~')
     credential_dir = os.path.join(home_dir, '.credentials')
     if not os.path.exists(credential_dir):
         os.makedirs(credential_dir)
-    credential_path = os.path.join(credential_dir,
-                                   'sheets.googleapis.com-python-quickstart.json')
+    credential_path = os.path.join(
+        credential_dir,
+        'sheets.googleapis.com-python-quickstart.json')
 
     store = Storage(credential_path)
     credentials = store.get()
@@ -52,11 +52,10 @@ def get_credentials():
         flow.user_agent = APPLICATION_NAME
         if flags:
             credentials = tools.run_flow(flow, store, flags)
-        else: # Needed only for compatibility with Python 2.6
+        else:  # Needed only for compatibility with Python 2.6
             credentials = tools.run(flow, store)
         print('Storing credentials to ' + credential_path)
     return credentials
 
 if __name__ == '__main__':
-	get_credentials()	
-
+    get_credentials()
