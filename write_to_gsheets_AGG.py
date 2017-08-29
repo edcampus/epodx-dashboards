@@ -1,18 +1,18 @@
 #!/usr/local/bin/python27
 # -*- coding: utf-8 -*-
 
-"""
-Program: Write to GSheets
+"""Program: Write to GSheets
 Programmer: Michael Fryar, Research Fellow, EPoD
 Date created: January 5, 2017
 
 Purpose: Write to Google Sheets via API.
 """
 # Note: Must first establish SSH connection to epodx analytics
-import requests
 import csv
 import os
+
 import httplib2
+import requests
 from apiclient import discovery
 
 import get_credentials
