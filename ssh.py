@@ -10,6 +10,7 @@ Purpose: Establish SSH tunnel using python rather than bash
 import os
 import subprocess
 
+import get_credentials
 from write_to_gsheets_AGG import write_to_sheet
 
 # Change to directory containing configuration files
@@ -33,4 +34,6 @@ ssh = "ssh -f {} {} sleep 10".format(config, option)
 subprocess.run(ssh)
 
 # Write to Google Sheets
-write_to_sheet()
+if __name__ == '__main__':
+    credentials = get_credentials.get_credentials()
+    write_to_sheet()
