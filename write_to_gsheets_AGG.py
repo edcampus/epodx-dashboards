@@ -15,7 +15,7 @@ import httplib2
 import requests
 from apiclient import discovery
 
-import get_credentials
+from get_credentials import get_credentials
 
 # WARNING: Keep your token secret!
 with open("hks_secret_token.txt", "r") as myfile:
@@ -75,6 +75,7 @@ def write_to_sheet():
     cr = csv.reader(decoded_content.splitlines(), delimiter=',')
     problem_responses = list(cr)
     # Next section builds on Google quickstart template to write to Sheets
+    credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
                     'version=v4')
@@ -99,5 +100,4 @@ def write_to_sheet():
         spreadsheetId=spreadsheetId, body=body).execute()
 
 if __name__ == '__main__':
-    credentials = get_credentials.get_credentials()
     write_to_sheet()
