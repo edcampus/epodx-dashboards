@@ -10,6 +10,7 @@ Purpose: Write to Google Sheets via API.
 # Note: Must first establish SSH connection to epodx analytics
 import csv
 import os
+import subprocess
 
 import httplib2
 import requests
@@ -17,10 +18,33 @@ from apiclient import discovery
 
 from get_credentials import get_credentials
 
-# WARNING: Keep your token secret!
+
+def ssh():
+    """SSH tunnel to EPoDX API"""
+    # Change to directory containing configuration files
+    home_dir = os.path.expanduser('~')
+    epodx_dir = os.path.join(home_dir, 'Documents/epodx')
+    os.chdir(epodx_dir)
+
+    # Establish SHH tunnel in background that auto-closes
+    # -f "fork into background"
+    # -F "use configuration file"
+    # -o ExistOnForwardFailure=yes "wait until connection and port
+    #     forwardings are set up before placing in background"
+    # sleep 10 "give python script 10 seconds to start using tunnel and
+    #     close tunnel after python script stops using it"
+    # Ref 1: https://www.g-loaded.eu/2006/11/24/auto-closing-ssh-tunnels/
+    # Ref 2: https://gist.github.com/scy/6781836
+
+    config = "-F ./ssh-config epodx-analytics-api"
+    option = "-o ExitOnForwardFailure=yes"
+    ssh = "ssh -f {} {} sleep 10".format(config, option)
+    subprocess.run(ssh, shell=True)
+
+
+# Read secret token needed to connect to API from untracked file
 with open("hks_secret_token.txt", "r") as myfile:
     hks_secret_token = myfile.read().replace('\n', '')
-
 # Course_id for Aggregating Evidence
 course_id = "course-v1:epodx+BCURE-AGG+2016_v1"
 
@@ -100,4 +124,5 @@ def write_to_sheet():
         spreadsheetId=spreadsheetId, body=body).execute()
 
 if __name__ == '__main__':
+    ssh()
     write_to_sheet()
