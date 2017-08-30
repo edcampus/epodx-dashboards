@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """Program: Get Credentials
 Programmer: Michael Fryar, Research Fellow, EPoD
 Date created: January 5, 2017
