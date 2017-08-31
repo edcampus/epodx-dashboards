@@ -1,0 +1,58 @@
+# Program: AGG.submit
+# Programmer: Michael Fryar, Evidence for Policy Design
+# Date created: August 8, 2017
+
+# Purpose: This a submit description file which contains commands to
+# direct the delayed execution of a script that downloads learner data
+# from the EPoDx unit Aggregating Evidence and then uploads that data
+# to a Google Sheet where it is cleaned and published to instructor
+# dashboards. The script is executed under HTCondor which is the batch
+# cluster resource manager for the Research Computing Environment (RCE)
+# hosted by the Harvard-MIT Data Center (HMDC). In non-technical terms, 
+# HTCondor is manages the HMDC's large, powerful pool of computers to
+# determine how to allocate computing resources to the simultaneous 
+# demands of multiple users, which is why it is known as a distributed
+# computing software. Condor has a CronTab scheduling functionality
+# that allows jobs to be run at specified intervals or at a specific
+# future date and time.
+
+# Use the vanilla universe, which supports serial job processing.
+Universe = vanilla
+
+Executable = /usr/local/bin/python36
+Arguments = ./write_to_gsheets_AGG.py
+
+# Set "deferral time" (schedule for specified date and time)
+# http://research.cs.wisc.edu/htcondor/manual/v7.6/2_12Time_Scheduling.html
+cron_minute = 40
+cron_hour = 13
+cron_day_of_month = 31
+cron_month = 8
+cron_day_of_week = *
+
+# Uncomment line below if scheduling to repeat (e.g. every hour)
+# on_exit_remove = false
+
+# Match job to execution machine up to two minutes before deferral time
+cron_prep_time = 120
+
+# Allow job to execute up to two minutes after deferral time
+cron_window = 120
+
+# Request 2048 MB of physical memory (RAM)
+request_memory  = 2048
+# Request one physical CPU core
+request_cpus    = 1
+
+# Notify upon completion
+notification = Complete
+notify_user = mfryar.hks@gmail.com
+
+# Write output, error, and log files to the following paths
+output  = ./condor/out
+error   = ./condor/error
+Log     = ./condor/log
+
+# Submit only one copy of the job
+Queue   1
+
