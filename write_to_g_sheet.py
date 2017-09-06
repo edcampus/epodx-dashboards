@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Program: Write to GSheets
+"""Program: Write to G Sheet
 Programmer: Michael Fryar, Research Fellow, EPoD
 Date created: January 5, 2017
 
@@ -31,32 +31,55 @@ def ssh():
     # -F "use configuration file"
     # -o ExistOnForwardFailure=yes "wait until connection and port
     #     forwardings are set up before placing in background"
-    # sleep 10 "give python script 10 seconds to start using tunnel and
+    # sleep 300 "give python script 300 seconds to start using tunnel and
     #     close tunnel after python script stops using it"
     # Ref 1: https://www.g-loaded.eu/2006/11/24/auto-closing-ssh-tunnels/
     # Ref 2: https://gist.github.com/scy/6781836
 
     config = "-F ./ssh-config epodx-analytics-api"
     option = "-o ExitOnForwardFailure=yes"
-    ssh = "ssh -f {} {} sleep 10".format(config, option)
+    ssh = "ssh -f {} {} sleep 300".format(config, option)
     subprocess.run(ssh, shell=True)
 
 
 # Read secret token needed to connect to API from untracked file
 with open("hks_secret_token.txt", "r") as myfile:
     hks_secret_token = myfile.read().replace('\n', '')
-# Course_id for Aggregating Evidence
-course_id = "course-v1:epodx+BCURE-AGG+2016_v1"
 
 
-def write_to_sheet():
+def write_to_g_sheet(course):
     """Downloads learner data from EPoDx and writes to Google Sheets.
 
     edX stores identifiable information about learners separately from
     problem response data, which is identifiable by user_id only. This
     function downloads learner data and problem response data via the
     EPoDx API and then writes this data to a Google Sheet.
+
+    Args:
+        course (str): Three letter course code. Known values are
+            AGG - Aggregating Evidence
+            COM - Commissioning Evidence
+            CBA - Cost-Benefit Analysis
+            DES - Descriptive Evidence
+            IMP - Impact Evaluations
+            SYS - Systematic Approaches to Policy Decisions
     """
+    course_id = "course-v1:epodx+BCURE-{}+2016_v1".format(course)
+    if course == "AGG":
+        spreadsheetId = "1uMAyKZYtoVLzqpknBxOGbkLjR7-AMqlEEowdFqSc3pw"
+    elif course == "COM":
+        spreadsheetId = "1z6xR_xspemndfyQ_hOoYKwBZAjEEA2nqItG__plOgmU"
+    elif course == "CBA":
+        spreadsheetId = "1-b-1r5CJIWEmGZ0R_vOVJLnmAvCntL88HXPle4XaiJ0"
+    elif course == "DES":
+        spreadsheetId = "1Yh3MQVz8AddovX1hKYNTwQ23C7OnDmJ9v0T39-lUvPU"
+    elif course == "IMP":
+        spreadsheetId = "1HUDWhXwr4Ekcs4lsqyGE6qoT4OsPaigH42zbsiY39NE"
+    elif course == "SYS":
+        spreadsheetId = "1h_RW5_-BduGg9__3wO9HZj7A0ch0DAqY5IQrZlI9Ow4"
+    else:
+        raise NameError("Module abbreviation not recognized.")
+
     # Extract learner data first. Start by defining parameters.
     learner_profile_report_url = "http://localhost:18100/api/v0/learners/"
     headers = {
@@ -106,7 +129,6 @@ def write_to_sheet():
     service = discovery.build('sheets', 'v4', http=http,
                               discoveryServiceUrl=discoveryUrl)
 
-    spreadsheetId = '1uMAyKZYtoVLzqpknBxOGbkLjR7-AMqlEEowdFqSc3pw'
     learners_range = 'student_profile_info'
     problem_range = 'problem_responses'
     data = [
@@ -125,4 +147,9 @@ def write_to_sheet():
 
 if __name__ == '__main__':
     ssh()
-    write_to_sheet()
+    write_to_g_sheet("AGG")
+    write_to_g_sheet("COM")
+    write_to_g_sheet("CBA")
+    write_to_g_sheet("DES")
+    write_to_g_sheet("IMP")
+    write_to_g_sheet("SYS")
