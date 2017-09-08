@@ -1,4 +1,4 @@
-# Program: AGG.submit
+# Program: write_to_g_sheet.submit
 # Programmer: Michael Fryar, Evidence for Policy Design
 # Date created: August 8, 2017
 
@@ -20,14 +20,14 @@
 Universe = vanilla
 
 Executable = /usr/local/bin/python36
-Arguments = ./write_to_gsheets_AGG.py
+Arguments = ./write_to_g_sheet.py
 
 # Set "deferral time" (schedule for specified date and time)
 # http://research.cs.wisc.edu/htcondor/manual/v7.6/2_12Time_Scheduling.html
-cron_minute = 40
-cron_hour = 13
-cron_day_of_month = 31
-cron_month = 8
+cron_minute = 50
+cron_hour = 11
+cron_day_of_month = 08
+cron_month = 09
 cron_day_of_week = *
 
 # Uncomment line below if scheduling to repeat (e.g. every hour)
@@ -39,13 +39,13 @@ cron_prep_time = 120
 # Allow job to execute up to two minutes after deferral time
 cron_window = 120
 
-# Request 2048 MB of physical memory (RAM)
-request_memory  = 2048
+# Request 16 GB (16,000 MB) of physical memory (RAM)
+request_memory  = 16000
 # Request one physical CPU core
 request_cpus    = 1
 
-# Notify upon completion
-notification = Complete
+# Notify if there is an error or when the job completes
+notification = Always
 notify_user = mfryar.hks@gmail.com
 
 # Write output, error, and log files to the following paths
