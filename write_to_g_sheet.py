@@ -31,14 +31,14 @@ def ssh():
     # -F "use configuration file"
     # -o ExistOnForwardFailure=yes "wait until connection and port
     #     forwardings are set up before placing in background"
-    # sleep 300 "give python script 300 seconds to start using tunnel and
+    # sleep 10 "give python script 10 seconds to start using tunnel and
     #     close tunnel after python script stops using it"
     # Ref 1: https://www.g-loaded.eu/2006/11/24/auto-closing-ssh-tunnels/
     # Ref 2: https://gist.github.com/scy/6781836
 
     config = "-F ./ssh-config epodx-analytics-api"
     option = "-o ExitOnForwardFailure=yes"
-    ssh = "ssh -f {} {} sleep 300".format(config, option)
+    ssh = "ssh -f {} {} sleep 10".format(config, option)
     subprocess.run(ssh, shell=True)
 
 
@@ -145,11 +145,16 @@ def write_to_g_sheet(course):
     result = service.spreadsheets().values().batchUpdate(
         spreadsheetId=spreadsheetId, body=body).execute()
 
-if __name__ == '__main__':
+
+def tunnel_and_write_to_g_sheet(course):
+    """Establish SSH tunnel and write to Google Sheet"""
     ssh()
-    write_to_g_sheet("AGG")
-    write_to_g_sheet("COM")
-    write_to_g_sheet("CBA")
-    write_to_g_sheet("DES")
-    write_to_g_sheet("IMP")
-    write_to_g_sheet("SYS")
+    write_to_g_sheet(course)
+
+if __name__ == '__main__':
+    tunnel_and_write_to_g_sheet("AGG")
+    tunnel_and_write_to_g_sheet("COM")
+    tunnel_and_write_to_g_sheet("CBA")
+    tunnel_and_write_to_g_sheet("DES")
+    tunnel_and_write_to_g_sheet("IMP")
+    tunnel_and_write_to_g_sheet("SYS")
