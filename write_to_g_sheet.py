@@ -152,9 +152,6 @@ def tunnel_and_write_to_g_sheet(course):
     write_to_g_sheet(course)
 
 if __name__ == '__main__':
-    tunnel_and_write_to_g_sheet("AGG")
-    tunnel_and_write_to_g_sheet("COM")
-    tunnel_and_write_to_g_sheet("CBA")
-    tunnel_and_write_to_g_sheet("DES")
-    tunnel_and_write_to_g_sheet("IMP")
-    tunnel_and_write_to_g_sheet("SYS")
+    courses = ["AGG", "COM", "CBA", "DES", "IMP", "SYS"]
+    for course in courses:
+        tunnel_and_write_to_g_sheet(course)
