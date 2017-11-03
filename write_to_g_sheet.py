@@ -156,6 +156,7 @@ def tunnel_and_write_to_g_sheet(course):
     """Establish SSH tunnel and write to Google Sheet"""
     ssh()
     write_to_g_sheet(course)
+    print("{} upload complete".format(course))
 
 if __name__ == '__main__':
     courses = ["AGG", "COM", "CBA", "DES", "IMP", "SYS"]
