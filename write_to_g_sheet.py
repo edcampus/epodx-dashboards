@@ -8,15 +8,20 @@ Date created: January 5, 2017
 Purpose: Write to Google Sheets via API.
 """
 # Note: Must first establish SSH connection to epodx analytics
-import csv
-import os
-import subprocess
+# Standard library imports
+import csv         # For reading data in comma separated value format
+import os          # For manipulating paths and changing directory
+import subprocess  # For spawning ssh tunnel
 
-import httplib2
-import requests
-from apiclient import discovery
+# Third-party imports
+import httplib2                  # "A comprehensive HTTP client library"
+import requests                  # "HTTP for Humans"
+from apiclient import discovery  # For acessing Google Sheets API
+# To install apiclient 'pip install --upgrade google-api-python-client'
 
+# User-written imports
 from get_credentials import get_credentials
+# For getting OAuth2 credentials to interact with Google Sheets API
 
 
 def ssh():
@@ -122,6 +127,7 @@ def write_to_g_sheet(course):
     cr = csv.reader(decoded_content.splitlines(), delimiter=',')
     problem_responses = list(cr)
     # Next section builds on Google quickstart template to write to Sheets
+    # https://developers.google.com/sheets/api/quickstart/python
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
