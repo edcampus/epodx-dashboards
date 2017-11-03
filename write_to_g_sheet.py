@@ -52,7 +52,7 @@ with open("hks_secret_token.txt", "r") as myfile:
     hks_secret_token = myfile.read().replace('\n', '')
 
 
-def write_to_g_sheet(course):
+def write_to_g_sheet(course, dashboard):
     """Downloads learner data from EPoDx and writes to Google Sheets.
 
     edX stores identifiable information about learners separately from
@@ -61,26 +61,41 @@ def write_to_g_sheet(course):
     EPoDx API and then writes this data to a Google Sheet.
 
     Args:
-        course (str): Three letter course code. Known values are
+        course (str): Three letter course code. Known values are:
             AGG - Aggregating Evidence
             COM - Commissioning Evidence
             CBA - Cost-Benefit Analysis
             DES - Descriptive Evidence
             IMP - Impact Evaluations
             SYS - Systematic Approaches to Policy Decisions
+        dashboard (str): When we have multiple cohorts completing the same unit
+        simultaneously, we need multiple dashboards for each unit. Known
+        values are:
+            AGG - Aggregating Evidence
+            COM - Commissioning Evidence
+            CBA - Cost-Benefit Analysis
+            DES1 - Descriptive Evidence 1
+            DES2 - Descriptive Evidence 2
+            IMP1 - Impact Evaluations 1
+            IMP2 - Impact Evaluations 2
+            SYS - Systematic Approaches to Policy Decisions
     """
     course_id = "course-v1:epodx+BCURE-{}+2016_v1".format(course)
-    if course == "AGG":
+    if dashboard == "AGG":
         spreadsheetId = "1uMAyKZYtoVLzqpknBxOGbkLjR7-AMqlEEowdFqSc3pw"
-    elif course == "COM":
+    elif dashboard == "COM":
         spreadsheetId = "1z6xR_xspemndfyQ_hOoYKwBZAjEEA2nqItG__plOgmU"
-    elif course == "CBA":
+    elif dashboard == "CBA":
         spreadsheetId = "1-b-1r5CJIWEmGZ0R_vOVJLnmAvCntL88HXPle4XaiJ0"
-    elif course == "DES":
+    elif dashboard == "DES1":
         spreadsheetId = "1Yh3MQVz8AddovX1hKYNTwQ23C7OnDmJ9v0T39-lUvPU"
-    elif course == "IMP":
+    elif dashboard == "DES2":
+        spreadsheetId = "1tOJoX60NT4Zfmne8SkWuOND2-xIYMujf-0500kRxfog"
+    elif dashboard == "IMP1":
         spreadsheetId = "1HUDWhXwr4Ekcs4lsqyGE6qoT4OsPaigH42zbsiY39NE"
-    elif course == "SYS":
+    elif dashboard == "IMP2":
+        spreadsheetId = "1HdbFZG9eunByuWE4KNkx9hmJ9HvxQitv7MuivZi8ouo"
+    elif dashboard == "SYS":
         spreadsheetId = "1h_RW5_-BduGg9__3wO9HZj7A0ch0DAqY5IQrZlI9Ow4"
     else:
         raise NameError("Module abbreviation not recognized.")
@@ -152,13 +167,13 @@ def write_to_g_sheet(course):
         spreadsheetId=spreadsheetId, body=body).execute()
 
 
-def tunnel_and_write_to_g_sheet(course):
+def tunnel_and_write_to_g_sheet(course, dashboard):
     """Establish SSH tunnel and write to Google Sheet"""
     ssh()
-    write_to_g_sheet(course)
-    print("{} upload complete".format(course))
+    write_to_g_sheet(course, dashboard)
+    print("{} upload to {} complete".format(course, dashboard))
 
 if __name__ == '__main__':
-    courses = ["AGG", "COM", "CBA", "DES", "IMP", "SYS"]
-    for course in courses:
-        tunnel_and_write_to_g_sheet(course)
+    # TO-DO ON MONDAY: Make argument a dictionary key:value pair
+    tunnel_and_write_to_g_sheet("DES", "DES2")
+    tunnel_and_write_to_g_sheet("IMP", "IMP2")
