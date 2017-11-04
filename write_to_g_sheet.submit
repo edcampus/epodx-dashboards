@@ -2,19 +2,18 @@
 # Programmer: Michael Fryar, Evidence for Policy Design
 # Date created: August 8, 2017
 
-# Purpose: This a submit description file which contains commands to
-# direct the delayed execution of a script that downloads learner data
-# from the EPoDx unit Aggregating Evidence and then uploads that data
-# to a Google Sheet where it is cleaned and published to instructor
-# dashboards. The script is executed under HTCondor which is the batch
-# cluster resource manager for the Research Computing Environment (RCE)
-# hosted by the Harvard-MIT Data Center (HMDC). In non-technical terms, 
-# HTCondor is manages the HMDC's large, powerful pool of computers to
-# determine how to allocate computing resources to the simultaneous 
-# demands of multiple users, which is why it is known as a distributed
-# computing software. Condor has a CronTab scheduling functionality
-# that allows jobs to be run at specified intervals or at a specific
-# future date and time.
+# Purpose: This a submit description file which contains commands to direct the
+# delayed execution of a script that downloads learner data from EPoDx digital
+# units (as specified in write_to_g_sheet.py) and then uploads that data to a
+# Google Sheet where it is cleaned and published to instructor dashboards.
+# The script is executed under HTCondor which is the batch cluster resource
+# manager for the Research Computing Environment (RCE) hosted by the
+# Harvard-MIT Data Center (HMDC). In non-technical terms, HTCondor manages the
+# HMDC's large, powerful pool of computers to determine how to allocate
+# computing resources to the simultaneous demands of multiple users, which is
+# why it is known as a distributed computing software. Condor has a CronTab
+# scheduling functionality that allows jobs to be run at specified intervals or
+# at a specific future date and time.
 
 # Use the vanilla universe, which supports serial job processing.
 Universe = vanilla
