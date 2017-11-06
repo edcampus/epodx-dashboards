@@ -5,9 +5,10 @@
 Programmer: Michael Fryar, Research Fellow, EPoD
 Date created: January 5, 2017
 
-Purpose: Write to Google Sheets via API.
+Purpose: Establish SSH tunnel to edX Analytics API, download learner
+data, and write data to Google Sheets via Sheets API.
 """
-# Note: Must first establish SSH connection to epodx analytics
+
 # Standard library imports
 import csv         # For reading data in comma separated value format
 import os          # For manipulating paths and changing directory
@@ -17,7 +18,7 @@ import subprocess  # For spawning ssh tunnel
 import httplib2                  # "A comprehensive HTTP client library"
 import requests                  # "HTTP for Humans"
 from apiclient import discovery  # For acessing Google Sheets API
-# To install apiclient 'pip install --upgrade google-api-python-client'
+# To install apiclient: 'pip install --upgrade google-api-python-client'
 
 # User-written imports
 from get_credentials import get_credentials
@@ -26,17 +27,17 @@ from get_credentials import get_credentials
 
 def ssh():
     """SSH tunnel to EPoDX API"""
-    # Change to directory containing configuration files
+    # Change to directory containing configuration files.
     home_dir = os.path.expanduser('~')
     epodx_dir = os.path.join(home_dir, 'Documents/epodx')
     os.chdir(epodx_dir)
 
-    # Establish SHH tunnel in background that auto-closes
+    # Establish SHH tunnel in background that auto-closes.
     # -f "fork into background"
     # -F "use configuration file"
     # -o ExistOnForwardFailure=yes "wait until connection and port
     #     forwardings are set up before placing in background"
-    # sleep 10 "give python script 10 seconds to start using tunnel and
+    # sleep 10 "give Python script 10 seconds to start using tunnel and
     #     close tunnel after python script stops using it"
     # Ref 1: https://www.g-loaded.eu/2006/11/24/auto-closing-ssh-tunnels/
     # Ref 2: https://gist.github.com/scy/6781836
@@ -47,7 +48,7 @@ def ssh():
     subprocess.run(ssh, shell=True)
 
 
-# Read secret token needed to connect to API from untracked file
+# Read secret token needed to connect to API from untracked file.
 with open("hks_secret_token.txt", "r") as myfile:
     hks_secret_token = myfile.read().replace('\n', '')
 
@@ -56,9 +57,10 @@ def write_to_g_sheet(course, sheet):
     """Downloads learner data from EPoDx and writes to Google Sheets.
 
     edX stores identifiable information about learners separately from
-    problem response data, which is identifiable by user_id only. This
+    problem response data, which is identifiable by user_id only.  This
     function downloads learner data and problem response data via the
-    EPoDx API and then writes this data to a Google Sheet.
+    edX Analytics API and then writes this data to a Google Sheet via
+    the Sheets API.
 
     Args:
         course (str): Three letter course code. Known values are:
@@ -68,9 +70,9 @@ def write_to_g_sheet(course, sheet):
             DES - Descriptive Evidence
             IMP - Impact Evaluations
             SYS - Systematic Approaches to Policy Decisions
-        sheet (str): When we have multiple cohorts completing the same unit
-        simultaneously, we need multiple dashboards for each unit. Known
-        values are:
+        sheet (str): Alphanumeric abbreviation for dashboard.  When we
+        have multiple cohorts completing the same unit simultaneously,
+        we need multiple dashboards for each unit.  Known values are:
             AGG - Aggregating Evidence
             COM - Commissioning Evidence
             CBA - Cost-Benefit Analysis
@@ -100,14 +102,14 @@ def write_to_g_sheet(course, sheet):
     else:
         raise NameError("Sheet abbreviation not recognized.")
 
-    # Extract learner data first. Start by defining parameters.
+    # Define parameters for extracting learner profile data.
     learner_profile_report_url = "http://localhost:18100/api/v0/learners/"
     headers = {
         "Authorization": "Token {}".format(hks_secret_token),
         "Accept": "text/csv",
     }
-    # The list of fields you've requested
-    # Leave this parameter off to see the full list of fields
+    # The list of fields you've requested.
+    # Leave this parameter off to see the full list of fields.
     fields = ','.join(["user_id", "username", "name", "email", "language",
                        "location", "year_of_birth", "gender",
                        "level_of_education", "mailing_address", "goals",
@@ -117,31 +119,32 @@ def write_to_g_sheet(course, sheet):
         "course_id": course_id,
         "fields": fields,
     }
-    # Download learner data
+    # Download learner data.
     with requests.Session() as s:
         download = s.get(
             learner_profile_report_url, headers=headers, params=params)
-    # Decode learner data
+    # Decode learner data.
     decoded_content = download.content.decode('ascii', 'ignore')
-    # Extract data from CSV into list
+    # Extract data from CSV into list.
     cr = csv.reader(decoded_content.splitlines(), delimiter=',')
     learner_profiles = list(cr)
 
-    # Extract problem response data. Start by defining parameters
+    # Define parameters for extracting problem response data.
     problem_api_url = ("http://localhost:18100/api/v0/courses/"
                        "{}/reports/problem_response".format(course_id))
     headers = {"Authorization": "Token {}".format(hks_secret_token)}
     problem_data = requests.get(problem_api_url, headers=headers).json()
     problem_download_url = problem_data['download_url']
-    # Download the CSV from download_url
+    # Download the CSV from download_url.
     with requests.Session() as s:
         download = s.get(problem_download_url)
-    # Decode problem response data
+    # Decode problem response data.
     decoded_content = download.content.decode('ascii', 'ignore')
-    # Extract data from CSV into list
+    # Extract data from CSV into list.
     cr = csv.reader(decoded_content.splitlines(), delimiter=',')
     problem_responses = list(cr)
-    # Next section builds on Google quickstart template to write to Sheets
+
+    # This section builds on Google quickstart template.
     # https://developers.google.com/sheets/api/quickstart/python
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
@@ -168,7 +171,7 @@ def write_to_g_sheet(course, sheet):
 
 
 def tunnel_and_write_to_g_sheet(dashboard):
-    """Establish SSH tunnel and write to Google Sheet"""
+    """Establish SSH tunnel, download data, and write to Google Sheet"""
     ssh()
     course = dashboard[0]
     sheet = dashboard[1]
