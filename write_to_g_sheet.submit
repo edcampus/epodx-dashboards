@@ -23,14 +23,14 @@ Arguments = ./write_to_g_sheet.py
 
 # Set "deferral time" (schedule for specified date and time)
 # http://research.cs.wisc.edu/htcondor/manual/v7.6/2_12Time_Scheduling.html
-cron_minute = 50
-cron_hour = 11
-cron_day_of_month = 08
-cron_month = 09
+cron_minute = 0
+cron_hour = *
+cron_day_of_month = *
+cron_month = 11
 cron_day_of_week = *
 
 # Uncomment line below if scheduling to repeat (e.g. every hour)
-# on_exit_remove = false
+on_exit_remove = false
 
 # Match job to execution machine up to two minutes before deferral time
 cron_prep_time = 120
