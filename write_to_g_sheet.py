@@ -53,7 +53,7 @@ with open("hks_secret_token.txt", "r") as myfile:
     hks_secret_token = myfile.read().replace('\n', '')
 
 
-def write_to_g_sheet(course, sheet):
+def write_to_g_sheet(selection, course, sheet):
     """Downloads learner data from EPoDx and writes to Google Sheets.
 
     edX stores identifiable information about learners separately from
@@ -63,6 +63,12 @@ def write_to_g_sheet(course, sheet):
     the Sheets API.
 
     Args:
+        selection (str): Specifies whether to download and write only learner
+        profiles, only problem responses or both. Known values are:
+            both - Download and write both learner profiles & problem responses
+            problems - Only download problem responses
+            profiles - Only download learner profiles
+
         course (str): Three letter course code. Known values are:
             AGG - Aggregating Evidence
             COM - Commissioning Evidence
@@ -102,47 +108,58 @@ def write_to_g_sheet(course, sheet):
     else:
         raise NameError("Sheet abbreviation not recognized.")
 
-    # Define parameters for extracting learner profile data.
-    learner_profile_report_url = "http://localhost:18100/api/v0/learners/"
-    headers = {
-        "Authorization": "Token {}".format(hks_secret_token),
-        "Accept": "text/csv",
-    }
-    # The list of fields you've requested.
-    # Leave this parameter off to see the full list of fields.
-    fields = ','.join(["user_id", "username", "name", "email", "language",
-                       "location", "year_of_birth", "gender",
-                       "level_of_education", "mailing_address", "goals",
-                       "enrollment_mode", "segments", "cohort", "city",
-                       "country", "enrollment_date", "last_updated"])
-    params = {
-        "course_id": course_id,
-        "fields": fields,
-    }
-    # Download learner data.
-    with requests.Session() as s:
-        download = s.get(
-            learner_profile_report_url, headers=headers, params=params)
-    # Decode learner data.
-    decoded_content = download.content.decode('ascii', 'ignore')
-    # Extract data from CSV into list.
-    cr = csv.reader(decoded_content.splitlines(), delimiter=',')
-    learner_profiles = list(cr)
+    if selection == "both":
+        print(
+            "Downloading and writing learner profiles and problem responses."
+        )
 
-    # Define parameters for extracting problem response data.
-    problem_api_url = ("http://localhost:18100/api/v0/courses/"
-                       "{}/reports/problem_response".format(course_id))
-    headers = {"Authorization": "Token {}".format(hks_secret_token)}
-    problem_data = requests.get(problem_api_url, headers=headers).json()
-    problem_download_url = problem_data['download_url']
-    # Download the CSV from download_url.
-    with requests.Session() as s:
-        download = s.get(problem_download_url)
-    # Decode problem response data.
-    decoded_content = download.content.decode('ascii', 'ignore')
-    # Extract data from CSV into list.
-    cr = csv.reader(decoded_content.splitlines(), delimiter=',')
-    problem_responses = list(cr)
+    if selection in ("both", "profiles"):
+        # Define parameters for extracting learner profile data.
+        learner_profile_report_url = "http://localhost:18100/api/v0/learners/"
+        headers = {
+            "Authorization": "Token {}".format(hks_secret_token),
+            "Accept": "text/csv",
+        }
+        # The list of fields you've requested.
+        # Leave this parameter off to see the full list of fields.
+        fields = ','.join(["user_id", "username", "name", "email", "language",
+                           "location", "year_of_birth", "gender",
+                           "level_of_education", "mailing_address", "goals",
+                           "enrollment_mode", "segments", "cohort", "city",
+                           "country", "enrollment_date", "last_updated"])
+        params = {
+            "course_id": course_id,
+            "fields": fields,
+        }
+        # Download learner data.
+        with requests.Session() as s:
+            download = s.get(
+                learner_profile_report_url, headers=headers, params=params)
+        # Decode learner data.
+        decoded_content = download.content.decode('ascii', 'ignore')
+        # Extract data from CSV into list.
+        cr = csv.reader(decoded_content.splitlines(), delimiter=',')
+        learner_profiles = list(cr)
+    elif selection == "problems":
+        print("Downloading and writing problem responses only.")
+
+    if selection in ("both", "problems"):
+        # Define parameters for extracting problem response data.
+        problem_api_url = ("http://localhost:18100/api/v0/courses/"
+                           "{}/reports/problem_response".format(course_id))
+        headers = {"Authorization": "Token {}".format(hks_secret_token)}
+        problem_data = requests.get(problem_api_url, headers=headers).json()
+        problem_download_url = problem_data['download_url']
+        # Download the CSV from download_url.
+        with requests.Session() as s:
+            download = s.get(problem_download_url)
+        # Decode problem response data.
+        decoded_content = download.content.decode('ascii', 'ignore')
+        # Extract data from CSV into list.
+        cr = csv.reader(decoded_content.splitlines(), delimiter=',')
+        problem_responses = list(cr)
+    elif selection == "profiles":
+        print("Downloading and writing learner profiles only.")
 
     # This section builds on Google quickstart template.
     # https://developers.google.com/sheets/api/quickstart/python
@@ -153,18 +170,35 @@ def write_to_g_sheet(course, sheet):
     service = discovery.build('sheets', 'v4', http=http,
                               discoveryServiceUrl=discoveryUrl)
 
-    learners_range = 'student_profile_info'
-    problem_range = 'problem_responses'
-    data = [
-        {
-            'range': learners_range,
-            'values': learner_profiles
-        },
-        {
-            'range': problem_range,
-            'values': problem_responses
-        }
-    ]
+    if selection in ("both", "profiles"):
+        learners_range = 'student_profile_info'
+    if selection in ("both", "problems"):
+        problem_range = 'problem_responses'
+    if selection == "both":
+        data = [
+            {
+                'range': learners_range,
+                'values': learner_profiles
+            },
+            {
+                'range': problem_range,
+                'values': problem_responses
+            }
+        ]
+    elif selection == "profiles":
+        data = [
+            {
+                'range': learners_range,
+                'values': learner_profiles
+            }
+        ]
+    elif selection == "problems":
+        data = [
+            {
+                'range': problem_range,
+                'values': problem_responses
+            }
+        ]
     body = {'valueInputOption': 'RAW', 'data': data}
     result = service.spreadsheets().values().batchUpdate(
         spreadsheetId=spreadsheetId, body=body).execute()
@@ -173,15 +207,15 @@ def write_to_g_sheet(course, sheet):
 def tunnel_and_write_to_g_sheet(dashboard):
     """Establish SSH tunnel, download data, and write to Google Sheet"""
     ssh()
-    course = dashboard[0]
-    sheet = dashboard[1]
-    write_to_g_sheet(course, sheet)
+    selection = dashboard[0]
+    course = dashboard[1]
+    sheet = dashboard[2]
+    write_to_g_sheet(selection, course, sheet)
     print("Upload to {} master sheet complete".format(sheet))
 
 if __name__ == '__main__':
     dashboards = [
-        ["AGG", "AGG"], ["COM", "COM"], ["CBA", "CBA"],
-        ["DES", "DES1"], ["IMP", "IMP1"], ["SYS", "SYS"]
+        ["both", "AGG", "AGG"]
     ]
     for dashboard in dashboards:
         tunnel_and_write_to_g_sheet(dashboard)
