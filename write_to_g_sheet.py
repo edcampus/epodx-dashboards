@@ -13,6 +13,7 @@ data, and write data to Google Sheets via Sheets API.
 import csv         # For reading data in comma separated value format
 import os          # For manipulating paths and changing directory
 import subprocess  # For spawning ssh tunnel
+import time        # For calculating run time
 
 # Third-party imports
 import httplib2                  # "A comprehensive HTTP client library"
@@ -23,6 +24,9 @@ from apiclient import discovery  # For acessing Google Sheets API
 # User-written imports
 from get_credentials import get_credentials
 # For getting OAuth2 credentials to interact with Google Sheets API
+
+# Start timer
+start_time = time.time()
 
 
 def ssh():
@@ -221,5 +225,9 @@ if __name__ == '__main__':
     dashboards = [
         ["AGG", "AGG"]
     ]
+
     for dashboard in dashboards:
         tunnel_and_write_to_g_sheet(dashboard)
+
+    total_time = round((time.time() - start_time), 2)
+    print("Total run time: {} seconds".format(total_time))
