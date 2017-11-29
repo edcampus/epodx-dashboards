@@ -53,7 +53,7 @@ with open("hks_secret_token.txt", "r") as myfile:
     hks_secret_token = myfile.read().replace('\n', '')
 
 
-def write_to_g_sheet(selection, course, sheet):
+def write_to_g_sheet(course, sheet, selection='both'):
     """Downloads learner data from EPoDx and writes to Google Sheets.
 
     edX stores identifiable information about learners separately from
@@ -63,12 +63,6 @@ def write_to_g_sheet(selection, course, sheet):
     the Sheets API.
 
     Args:
-        selection (str): Specifies whether to download and write only learner
-        profiles, only problem responses or both. Known values are:
-            both - Download and write both learner profiles & problem responses
-            problems - Only download problem responses
-            profiles - Only download learner profiles
-
         course (str): Three letter course code. Known values are:
             AGG - Aggregating Evidence
             COM - Commissioning Evidence
@@ -76,6 +70,7 @@ def write_to_g_sheet(selection, course, sheet):
             DES - Descriptive Evidence
             IMP - Impact Evaluations
             SYS - Systematic Approaches to Policy Decisions
+
         sheet (str): Alphanumeric abbreviation for dashboard.  When we
         have multiple cohorts completing the same unit simultaneously,
         we need multiple dashboards for each unit.  Known values are:
@@ -87,6 +82,12 @@ def write_to_g_sheet(selection, course, sheet):
             IMP1 - Impact Evaluations 1
             IMP2 - Impact Evaluations 2
             SYS - Systematic Approaches to Policy Decisions
+
+        selection (str): Specifies whether to download and write only learner
+        profiles, only problem responses or both. Known values are:
+            both - Download and write both learner profiles & problem responses
+            problems - Only download problem responses
+            profiles - Only download learner profiles
     """
     course_id = "course-v1:epodx+BCURE-{}+2016_v1".format(course)
     if sheet == "AGG":
@@ -207,15 +208,18 @@ def write_to_g_sheet(selection, course, sheet):
 def tunnel_and_write_to_g_sheet(dashboard):
     """Establish SSH tunnel, download data, and write to Google Sheet"""
     ssh()
-    selection = dashboard[0]
-    course = dashboard[1]
-    sheet = dashboard[2]
-    write_to_g_sheet(selection, course, sheet)
+    course = dashboard[0]
+    sheet = dashboard[1]
+    if len(dashboard) == 2:
+        write_to_g_sheet(course, sheet)
+    elif len(dashboard) == 3:
+        selection = dashboard[2]
+        write_to_g_sheet(course, sheet, selection)
     print("Upload to {} master sheet complete".format(sheet))
 
 if __name__ == '__main__':
     dashboards = [
-        ["both", "AGG", "AGG"]
+        ["AGG", "AGG"]
     ]
     for dashboard in dashboards:
         tunnel_and_write_to_g_sheet(dashboard)
