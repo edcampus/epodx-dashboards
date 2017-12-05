@@ -57,7 +57,7 @@ with open("hks_secret_token.txt", "r") as myfile:
     hks_secret_token = myfile.read().replace('\n', '')
 
 
-def write_to_g_sheet(course, sheet, selection='both'):
+def write_to_g_sheet(course, data_selection='both', sheet_selection='primary'):
     """Downloads learner data from EPoDx and writes to Google Sheets.
 
     edX stores identifiable information about learners separately from
@@ -75,50 +75,47 @@ def write_to_g_sheet(course, sheet, selection='both'):
             IMP - Impact Evaluations
             SYS - Systematic Approaches to Policy Decisions
 
-        sheet (str): Alphanumeric abbreviation for dashboard.  When we
-        have multiple cohorts completing the same unit simultaneously,
-        we need multiple dashboards for each unit.  Known values are:
-            AGG - Aggregating Evidence
-            COM - Commissioning Evidence
-            CBA - Cost-Benefit Analysis
-            DES1 - Descriptive Evidence 1
-            DES2 - Descriptive Evidence 2
-            IMP1 - Impact Evaluations 1
-            IMP2 - Impact Evaluations 2
-            SYS - Systematic Approaches to Policy Decisions
-
-        selection (str): Specifies whether to download and write only learner
-        profiles, only problem responses or both. Known values are:
+        data_selection (str): Specifies whether to download and write only
+        learner profiles, only problem responses or both. Known values are:
             both - Download and write both learner profiles & problem responses
             problems - Only download problem responses
             profiles - Only download learner profiles
+
+        sheet_selection (str): For courses where there are multiple dashboards,
+        this specifies which dashboard to update. Multiple dashboards exist for
+        some units because we have had multiple cohorts completing that unit
+        simultaneously in the past. Known values are:
+            primary - Write to primary master sheet
+            secondary - Write to secondary master sheet
+
     """
     course_id = "course-v1:epodx+BCURE-{}+2016_v1".format(course)
-    if sheet == "AGG":
+    if course == "AGG":
         spreadsheetId = "1uMAyKZYtoVLzqpknBxOGbkLjR7-AMqlEEowdFqSc3pw"
-    elif sheet == "COM":
+    elif course == "COM":
         spreadsheetId = "1z6xR_xspemndfyQ_hOoYKwBZAjEEA2nqItG__plOgmU"
-    elif sheet == "CBA":
+    elif course == "CBA":
         spreadsheetId = "1-b-1r5CJIWEmGZ0R_vOVJLnmAvCntL88HXPle4XaiJ0"
-    elif sheet == "DES1":
+    elif course == "DES" and sheet_selection == "primary":
         spreadsheetId = "1Yh3MQVz8AddovX1hKYNTwQ23C7OnDmJ9v0T39-lUvPU"
-    elif sheet == "DES2":
+    elif course == "DES" and sheet_selection == "secondary":
         spreadsheetId = "1tOJoX60NT4Zfmne8SkWuOND2-xIYMujf-0500kRxfog"
-    elif sheet == "IMP1":
+    elif course == "IMP" and sheet_selection == "primary":
         spreadsheetId = "1HUDWhXwr4Ekcs4lsqyGE6qoT4OsPaigH42zbsiY39NE"
-    elif sheet == "IMP2":
+    elif course == "IMP" and sheet_selection == "secondary":
         spreadsheetId = "1HdbFZG9eunByuWE4KNkx9hmJ9HvxQitv7MuivZi8ouo"
-    elif sheet == "SYS":
+    elif course == "SYS":
         spreadsheetId = "1h_RW5_-BduGg9__3wO9HZj7A0ch0DAqY5IQrZlI9Ow4"
     else:
-        raise NameError("Sheet abbreviation not recognized.")
+        raise NameError("Arguments not recognized.")
 
-    if selection == "both":
-        print(
-            "Downloading and writing learner profiles and problem responses."
-        )
+    if data_selection == "both":
+        message_to_print = ("Downloading and writing {} learner profiles and "
+                            "problem responses.".format(course)
+                            )
+        print(message_to_print)
 
-    if selection in ("both", "profiles"):
+    if data_selection in ("both", "profiles"):
         # Define parameters for extracting learner profile data.
         learner_profile_report_url = "http://localhost:18100/api/v0/learners/"
         headers = {
@@ -145,10 +142,14 @@ def write_to_g_sheet(course, sheet, selection='both'):
         # Extract data from CSV into list.
         cr = csv.reader(decoded_content.splitlines(), delimiter=',')
         learner_profiles = list(cr)
-    elif selection == "problems":
-        print("Downloading and writing problem responses only.")
+        # TODO: Explore deleting all but specified cohort. Be sure to plan.
+    elif data_selection == "problems":
+        message_to_print = ("Downloading and writing {} problem responses "
+                            "only.".format(course)
+                            )
+        print(message_to_print)
 
-    if selection in ("both", "problems"):
+    if data_selection in ("both", "problems"):
         # Define parameters for extracting problem response data.
         problem_api_url = ("http://localhost:18100/api/v0/courses/"
                            "{}/reports/problem_response".format(course_id))
@@ -163,9 +164,14 @@ def write_to_g_sheet(course, sheet, selection='both'):
         # Extract data from CSV into list.
         cr = csv.reader(decoded_content.splitlines(), delimiter=',')
         problem_responses = list(cr)
-    elif selection == "profiles":
-        print("Downloading and writing learner profiles only.")
+        # TODO: Explore deleting all responses older than 31 days
+    elif data_selection == "profiles":
+        message_to_print = ("Downloading and writing {} learner profiles "
+                            "only.".format(course)
+                            )
+        print(message_to_print)
 
+    # TODO: Break into separate function
     # This section builds on Google quickstart template.
     # https://developers.google.com/sheets/api/quickstart/python
     credentials = get_credentials()
@@ -175,11 +181,11 @@ def write_to_g_sheet(course, sheet, selection='both'):
     service = discovery.build('sheets', 'v4', http=http,
                               discoveryServiceUrl=discoveryUrl)
 
-    if selection in ("both", "profiles"):
+    if data_selection in ("both", "profiles"):
         learners_range = 'student_profile_info'
-    if selection in ("both", "problems"):
+    if data_selection in ("both", "problems"):
         problem_range = 'problem_responses'
-    if selection == "both":
+    if data_selection == "both":
         data = [
             {
                 'range': learners_range,
@@ -190,14 +196,14 @@ def write_to_g_sheet(course, sheet, selection='both'):
                 'values': problem_responses
             }
         ]
-    elif selection == "profiles":
+    elif data_selection == "profiles":
         data = [
             {
                 'range': learners_range,
                 'values': learner_profiles
             }
         ]
-    elif selection == "problems":
+    elif data_selection == "problems":
         data = [
             {
                 'range': problem_range,
@@ -213,17 +219,34 @@ def tunnel_and_write_to_g_sheet(dashboard):
     """Establish SSH tunnel, download data, and write to Google Sheet"""
     ssh()
     course = dashboard[0]
-    sheet = dashboard[1]
-    if len(dashboard) == 2:
-        write_to_g_sheet(course, sheet)
-    elif len(dashboard) == 3:
-        selection = dashboard[2]
-        write_to_g_sheet(course, sheet, selection)
-    print("Upload to {} master sheet complete".format(sheet))
+    if len(dashboard) == 1:
+        write_to_g_sheet(course)
+        message_to_print = ("Upload profiles and problems to {} primary "
+                            "master sheet complete".format(course)
+                            )
+        print(message_to_print)
+
+    else:
+        if "profiles" in dashboard:
+            data_selection = "profiles"
+        elif "problems" in dashboard:
+            data_selection = "problems"
+        else:
+            data_selection = "both"
+
+        if "secondary" in dashboard:
+            sheet_selection = "secondary"
+        else:
+            sheet_selection = "primary"
+
+        write_to_g_sheet(course, data_selection, sheet_selection)
+        print("Upload {} to {} {} master sheet complete".format(
+            data_selection, course, sheet_selection))
 
 if __name__ == '__main__':
     dashboards = [
-        ["AGG", "AGG"]
+        ["AGG"], ["SYS", "problems"], ["IMP", "secondary"],
+        ["DES", "profiles", "secondary"]
     ]
 
     for dashboard in dashboards:
