@@ -84,7 +84,7 @@ def pull_engagement_data(course):
     params = {
         "course_id": course_id,
         "fields": fields,
-        "segments": "highly_engaged,disengaging,struggling"
+        "ignore_segments": "inactive"
     }
     # Download learner data.
     with requests.Session() as s:
