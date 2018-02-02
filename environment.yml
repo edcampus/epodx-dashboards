@@ -1,4 +1,4 @@
-name: epodx_dashboards
+name: epodx-dashboards
 channels:
   - defaults
 dependencies:
@@ -32,5 +32,5 @@ dependencies:
     - pyasn1-modules==0.2.1
     - rsa==3.4.2
     - uritemplate==3.0.0
-prefix: C:\Users\mifryar\AppData\Local\conda\conda\envs\epodx_dashboards
+prefix: C:\Users\mifryar\AppData\Local\conda\conda\envs\epodx-dashboards
 
