@@ -17,7 +17,7 @@ import subprocess  # For spawning ssh tunnel
 import time        # For calculating run time
 
 # Third-party imports
-import requests                  # "HTTP for Humans"
+import requests    # "HTTP for Humans"
 
 # Start timer
 start_time = time.time()
@@ -27,7 +27,7 @@ def ssh():
     """SSH tunnel to EPoDX API"""
     # Change to directory containing configuration files.
     home_dir = os.path.expanduser('~')
-    epodx_dir = os.path.join(home_dir, 'Documents/epodx')
+    epodx_dir = os.path.join(home_dir, 'epodx')
     os.chdir(epodx_dir)
 
     # Establish SHH tunnel in background that auto-closes.
@@ -98,8 +98,8 @@ def pull_engagement_data(course):
     # Change to directory where engagment files are saved.
     home_dir = os.path.expanduser('~')
     archive_path = (
-        'Dropbox (CID)\Training Assessment and Research' +
-        '\BCURE Learner Engagement Reports\{}'.format(course)
+        'Dropbox (CID)/Training Assessment and Research' +
+        '/BCURE Learner Engagement Reports/{}'.format(course)
     )
     archive_dir = os.path.join(home_dir, archive_path)
     os.chdir(archive_dir)
@@ -117,12 +117,12 @@ def pull_engagement_data(course):
             sys.exit(
                 'file {}, line {}: {}'.format(filename, reader.line_num, e)
             )
-    print("Engagement data written to {}\{}".format(course, csvname))
+    print("Engagement data written to {}/{}".format(course, csvname))
 
 
 if __name__ == '__main__':
     print("Beginning to write engagement data to Dropbox (CID)"
-          "\Training Assessment and Research\BCURE Learner Engagement Reports")
+          "/Training Assessment and Research/BCURE Learner Engagement Reports")
     ssh()
     courses = ["AGG", "CBA", "COM", "DES", "IMP", "SYS"]
     for course in courses:

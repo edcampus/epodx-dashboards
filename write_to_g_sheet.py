@@ -33,7 +33,7 @@ def ssh():
     """SSH tunnel to EPoDX API"""
     # Change to directory containing configuration files.
     home_dir = os.path.expanduser('~')
-    epodx_dir = os.path.join(home_dir, 'Documents/epodx')
+    epodx_dir = os.path.join(home_dir, 'epodx')
     os.chdir(epodx_dir)
 
     # Establish SHH tunnel in background that auto-closes.
