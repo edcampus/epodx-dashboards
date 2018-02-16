@@ -27,7 +27,7 @@ def ssh():
     """SSH tunnel to EPoDX API"""
     # Change to directory containing configuration files.
     home_dir = os.path.expanduser('~')
-    epodx_dir = os.path.join(home_dir, 'epodx')
+    epodx_dir = os.path.join(home_dir, 'EPoD/epodx')
     os.chdir(epodx_dir)
 
     # Establish SHH tunnel in background that auto-closes.
@@ -98,7 +98,7 @@ def pull_engagement_data(course):
     # Change to directory where engagment files are saved.
     home_dir = os.path.expanduser('~')
     archive_path = (
-        'Dropbox (CID)/Training Assessment and Research' +
+        'EPoD/Dropbox (CID)/Training Assessment and Research' +
         '/BCURE Learner Engagement Reports/{}'.format(course)
     )
     archive_dir = os.path.join(home_dir, archive_path)
