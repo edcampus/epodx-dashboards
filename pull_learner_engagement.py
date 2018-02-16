@@ -86,38 +86,42 @@ def pull_engagement_data(course):
         "fields": fields,
         "ignore_segments": "inactive"
     }
-    # Download learner data.
+    # Download engagement data.
     with requests.Session() as s:
         download = s.get(
             learner_profile_report_url, headers=headers, params=params)
-    # Decode learner data.
-    decoded_content = download.content.decode('ascii', 'ignore')
-    # Extract data from CSV into list.
-    cr = csv.reader(decoded_content.splitlines(), delimiter=',')
-    learner_profiles = list(cr)
-    # Change to directory where engagment files are saved.
-    home_dir = os.path.expanduser('~')
-    archive_path = (
-        'EPoD/Dropbox (CID)/Training Assessment and Research' +
-        '/BCURE Learner Engagement Reports/{}'.format(course)
-    )
-    archive_dir = os.path.join(home_dir, archive_path)
-    os.chdir(archive_dir)
-    # Get timestamp to add to file name
-    now = datetime.utcnow().strftime("%Y-%m-%d_%H.%M.%S")
-    # Write data to csv
-    # TODO: Add column with date range and then append
-    csvname = '{}_engagement_{}_UTC.csv'.format(course, now)
-    with open(csvname, 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        try:
-            for row in learner_profiles:
-                writer.writerow(row)
-        except csv.Error as e:
-            sys.exit(
-                'file {}, line {}: {}'.format(filename, reader.line_num, e)
-            )
-    print("Engagement data written to {}/{}".format(course, csvname))
+    download_reader = csv.reader(download.text.splitlines(), delimiter=',')
+    engagement_data = list(download_reader)
+    # Check if there is any new engagement data
+    if len(engagement_data):
+        # Add timestamp to engagement data
+        now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        for row in engagement_data[1:]:
+            row.append(now)
+
+        # Change to directory where engagment files are saved.
+        home_dir = os.path.expanduser('~')
+        archive_path = (
+            'EPoD/Dropbox (CID)/Training Assessment and Research' +
+            '/BCURE Learner Engagement Reports/{}'.format(course)
+        )
+        archive_dir = os.path.join(home_dir, archive_path)
+        os.chdir(archive_dir)
+
+        # Append data to master file
+        mastername = '{}_engagement_master.csv'.format(course)
+        with open(mastername, 'a', newline='') as masterfile:
+            writer = csv.writer(masterfile)
+            try:
+                for row in engagement_data[1:]:
+                    writer.writerow(row)
+            except csv.Error as e:
+                sys.exit(
+                    'file {}, line {}: {}'.format(filename, reader.line_num, e)
+                )
+        print("Engagement data written to {}/{}".format(course, csvname))
+    else:
+        print("No new engagement data for {}".format(course))
 
 
 if __name__ == '__main__':
