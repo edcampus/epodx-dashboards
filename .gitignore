@@ -9,5 +9,8 @@ hks_secret_token.txt
 # Condor log, error, and output files
 condor/
 
+# Jupyter notebook checkpoints
+.ipynb_checkpoints
+
 # gedit backups
 *~
