@@ -7,6 +7,8 @@ Date created: January 5, 2017
 
 Purpose: Establish SSH tunnel to edX Analytics API, download learner
 data, and write data to Google Sheets via Sheets API.
+
+First time: Must run get_credentials.py first
 """
 
 # Standard library imports

@@ -9,6 +9,9 @@ hks_secret_token.txt
 # Condor log, error, and output files
 condor/
 
+# Google OAuth credentials
+client_secret.json
+
 # Jupyter notebook checkpoints
 .ipynb_checkpoints
 

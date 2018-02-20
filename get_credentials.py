@@ -6,6 +6,14 @@ Date created: January 5, 2017
 
 Purpose: Gets OAuth2 credentials to allow interacting
 with Google Sheets via API.
+
+Note: Need to first follow instructions below to download OAuth credentials
+1. Open the Google Developers Console:
+https://console.developers.google.com/
+2. Select the EPoDx Data Dashboards project
+3. In the left-hand menu, select Credentials.
+4. Under OAuth 2.0 client IDs, click the download button on the far-right
+5. Move this file to working directory and rename it client_secret.json.
 """
 
 from __future__ import print_function
@@ -58,6 +66,7 @@ def get_credentials():
             credentials = tools.run(flow, store)
         print('Storing credentials to ' + credential_path)
     return credentials
+
 
 if __name__ == '__main__':
     get_credentials()
