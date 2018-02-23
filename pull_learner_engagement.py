@@ -119,7 +119,7 @@ def pull_engagement_data(course):
                 sys.exit(
                     'file {}, line {}: {}'.format(filename, reader.line_num, e)
                 )
-        print("Engagement data written to {}/{}".format(course, csvname))
+        print("Engagement data written to {}/{}".format(course, mastername))
     else:
         print("No new engagement data for {}".format(course))
 
