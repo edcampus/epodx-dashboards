@@ -28,7 +28,7 @@ from get_credentials import get_credentials
 # For getting OAuth2 credentials to interact with Google Sheets API
 
 # Start timer
-start_time = time.time()
+START_TIME = time.time()
 
 
 def ssh():
@@ -50,13 +50,13 @@ def ssh():
 
     config = "-F ./ssh-config epodx-analytics-api"
     option = "-o ExitOnForwardFailure=yes"
-    ssh = "ssh -f {} {} sleep 10".format(config, option)
-    subprocess.run(ssh, shell=True)
+    command = "ssh -f {} {} sleep 10".format(config, option)
+    subprocess.run(command, shell=True)
 
 
 # Read secret token needed to connect to API from untracked file.
 with open("hks_secret_token.txt", "r") as myfile:
-    hks_secret_token = myfile.read().replace('\n', '')
+    HKS_SECRET_TOKEN = myfile.read().replace('\n', '')
 
 
 def write_to_g_sheet(course, data_selection='both', sheet_selection='primary'):
@@ -121,7 +121,7 @@ def write_to_g_sheet(course, data_selection='both', sheet_selection='primary'):
         # Define parameters for extracting learner profile data.
         learner_profile_report_url = "http://localhost:18100/api/v0/learners/"
         headers = {
-            "Authorization": "Token {}".format(hks_secret_token),
+            "Authorization": "Token {}".format(HKS_SECRET_TOKEN),
             "Accept": "text/csv",
         }
         # The list of fields you've requested.
@@ -155,7 +155,7 @@ def write_to_g_sheet(course, data_selection='both', sheet_selection='primary'):
         # Define parameters for extracting problem response data.
         problem_api_url = ("http://localhost:18100/api/v0/courses/"
                            "{}/reports/problem_response".format(course_id))
-        headers = {"Authorization": "Token {}".format(hks_secret_token)}
+        headers = {"Authorization": "Token {}".format(HKS_SECRET_TOKEN)}
         problem_data = requests.get(problem_api_url, headers=headers).json()
         problem_download_url = problem_data['download_url']
         # Download the CSV from download_url.
@@ -255,5 +255,5 @@ if __name__ == '__main__':
     for dashboard in dashboards:
         tunnel_and_write_to_g_sheet(dashboard)
 
-    total_time = round((time.time() - start_time), 2)
-    print("Total run time: {} seconds".format(total_time))
+    TOTAL_TIME = round((time.time() - START_TIME), 2)
+    print("Total run time: {} seconds".format(TOTAL_TIME))
