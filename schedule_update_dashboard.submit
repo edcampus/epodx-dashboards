@@ -23,10 +23,10 @@ Arguments = ./update_dashboard.py
 
 # Set "deferral time" (schedule for specified date and time)
 # http://research.cs.wisc.edu/htcondor/manual/v7.6/2_12Time_Scheduling.html
-cron_minute = 0
-cron_hour = *
+cron_minute = 55
+cron_hour = 15
 cron_day_of_month = *
-cron_month = 11
+cron_month = *
 cron_day_of_week = *
 
 # Uncomment line below if scheduling to repeat (e.g. every hour)
@@ -38,8 +38,8 @@ cron_prep_time = 120
 # Allow job to execute up to two minutes after deferral time
 cron_window = 120
 
-# Request 16 GB (16,000 MB) of physical memory (RAM)
-request_memory  = 16000
+# Request 2 GB (2,000 MB) of physical memory (RAM)
+request_memory  = 2000
 # Request one physical CPU core
 request_cpus    = 1
 
