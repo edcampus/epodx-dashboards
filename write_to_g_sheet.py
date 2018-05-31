@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Program: Write to G Sheet
+"""Program: Update Dashboard
 Programmer: Michael Fryar, Research Fellow, EPoD
 Date created: January 5, 2017
 
@@ -84,30 +84,42 @@ def write_to_g_sheet(course, data_selection='both', sheet_selection='primary'):
             profiles - Only download learner profiles
 
         sheet_selection (str): For courses where there are multiple dashboards,
-        this specifies which dashboard to update. Multiple dashboards exist for
-        some units because we have had multiple cohorts completing that unit
-        simultaneously in the past. Known values are:
+        this specifies which dashboard to update. Multiple dashboards exist
+        becuase the instructor-facing Wix dashboards point to specific sheets
+        for each country. Known values are:
             primary - Write to primary master sheet
-            secondary - Write to secondary master sheet
+            LBSNAA - Write to master sheet reserved for LBSNAA trainings
+            NSPP - Write to master sheet reserved for NSPP trainings
 
     """
     course_id = "course-v1:epodx+BCURE-{}+2016_v1".format(course)
     if course == "AGG":
         spreadsheetId = "1uMAyKZYtoVLzqpknBxOGbkLjR7-AMqlEEowdFqSc3pw"
+
     elif course == "COM":
         spreadsheetId = "1z6xR_xspemndfyQ_hOoYKwBZAjEEA2nqItG__plOgmU"
+
     elif course == "CBA":
         spreadsheetId = "1-b-1r5CJIWEmGZ0R_vOVJLnmAvCntL88HXPle4XaiJ0"
+
     elif course == "DES" and sheet_selection == "primary":
         spreadsheetId = "1Yh3MQVz8AddovX1hKYNTwQ23C7OnDmJ9v0T39-lUvPU"
-    elif course == "DES" and sheet_selection == "secondary":
+
+    elif course == "DES" and sheet_selection == "LBSNAA":
         spreadsheetId = "1tOJoX60NT4Zfmne8SkWuOND2-xIYMujf-0500kRxfog"
+
     elif course == "IMP" and sheet_selection == "primary":
         spreadsheetId = "1HUDWhXwr4Ekcs4lsqyGE6qoT4OsPaigH42zbsiY39NE"
-    elif course == "IMP" and sheet_selection == "secondary":
+
+    elif course == "IMP" and sheet_selection == "LBSNAA":
         spreadsheetId = "1HdbFZG9eunByuWE4KNkx9hmJ9HvxQitv7MuivZi8ouo"
+
+    elif course == "IMP" and sheet_selection == "NSPP":
+        spreadsheetId = "1ta5gB8AfZS9kFrG6NBXyjm_jKnM_7mRj7ddUowdnkog"
+
     elif course == "SYS":
         spreadsheetId = "1h_RW5_-BduGg9__3wO9HZj7A0ch0DAqY5IQrZlI9Ow4"
+
     else:
         raise NameError("Arguments not recognized.")
 
@@ -236,8 +248,10 @@ def tunnel_and_write_to_g_sheet(dashboard):
         else:
             data_selection = "both"
 
-        if "secondary" in dashboard:
-            sheet_selection = "secondary"
+        if "LBSNAA" in dashboard:
+            sheet_selection = "LBSNAA"
+        if "NSPP" in dashboard:
+            sheet_selection = "NSPP"
         else:
             sheet_selection = "primary"
 
@@ -248,8 +262,7 @@ def tunnel_and_write_to_g_sheet(dashboard):
 
 if __name__ == '__main__':
     dashboards = [
-        ["AGG"], ["SYS", "problems"], ["IMP", "secondary"],
-        ["DES", "profiles", "secondary"]
+        ["IMP", "problems", "NSPP"],
     ]
 
     for dashboard in dashboards:
