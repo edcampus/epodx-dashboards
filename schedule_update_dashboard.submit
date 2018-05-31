@@ -1,4 +1,4 @@
-# Program: write_to_g_sheet.submit
+# Program: schedule_update_dashboard.submit
 # Programmer: Michael Fryar, Evidence for Policy Design
 # Date created: August 8, 2017
 
@@ -19,7 +19,7 @@
 Universe = vanilla
 
 Executable = /usr/local/bin/python36
-Arguments = ./write_to_g_sheet.py
+Arguments = ./update_dashboard.py
 
 # Set "deferral time" (schedule for specified date and time)
 # http://research.cs.wisc.edu/htcondor/manual/v7.6/2_12Time_Scheduling.html
