@@ -117,8 +117,11 @@ def write_to_g_sheet(course, data_selection='both', sheet_selection='primary'):
     elif course == "IMP" and sheet_selection == "NSPP":
         spreadsheetId = "1ta5gB8AfZS9kFrG6NBXyjm_jKnM_7mRj7ddUowdnkog"
 
-    elif course == "SYS":
+    elif course == "SYS" and sheet_selection == "primary":
         spreadsheetId = "1h_RW5_-BduGg9__3wO9HZj7A0ch0DAqY5IQrZlI9Ow4"
+
+    elif course == "SYS" and sheet_selection == "NSPP":
+        spreadsheetId = "1nGHJd2eFimM5JSGq3xB-2oIQHTkV_uH0wDgFHSQ-Pso"
 
     else:
         raise NameError("Arguments not recognized.")
@@ -262,7 +265,7 @@ def tunnel_and_write_to_g_sheet(dashboard):
 
 if __name__ == '__main__':
     dashboards = [
-        ["IMP", "problems", "NSPP"],
+        ["SYS", "problems", "NSPP"], ["IMP", "problems", "NSPP"],
     ]
 
     for dashboard in dashboards:
