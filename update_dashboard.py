@@ -20,15 +20,19 @@ import time        # For calculating run time
 # Third-party imports
 import httplib2                  # "A comprehensive HTTP client library"
 import requests                  # "HTTP for Humans"
-from apiclient import discovery  # For acessing Google Sheets API
 # To install apiclient: 'pip install --upgrade google-api-python-client'
+from apiclient import discovery  # For acessing Google Sheets API
 
 # User-written imports
-from get_credentials import get_credentials
+import secrets                   # Token for edX Analytics API authentication
 # For getting OAuth2 credentials to interact with Google Sheets API
+from get_credentials import get_credentials
 
 # Start timer
 START_TIME = time.time()
+
+# Get token for edX Analytics API authentication
+HKS_SECRET_TOKEN = secrets.HKS_SECRET_TOKEN
 
 
 def ssh():
@@ -52,11 +56,6 @@ def ssh():
     option = "-o ExitOnForwardFailure=yes"
     command = "ssh -f {} {} sleep 10".format(config, option)
     subprocess.run(command, shell=True)
-
-
-# Read secret token needed to connect to API from untracked file.
-with open("hks_secret_token.txt", "r") as myfile:
-    HKS_SECRET_TOKEN = myfile.read().replace('\n', '')
 
 
 def write_to_g_sheet(course, data_selection='both', sheet_selection='primary'):
