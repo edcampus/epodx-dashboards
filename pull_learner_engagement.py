@@ -19,8 +19,14 @@ import time        # For calculating run time
 # Third-party imports
 import requests    # "HTTP for Humans"
 
+# User-written imports
+import secrets     # Token for edX Analytics API authentication
+
 # Start timer
 start_time = time.time()
+
+# Get token for edX Analytics API authentication
+HKS_SECRET_TOKEN = secrets.HKS_SECRET_TOKEN
 
 
 def ssh():
@@ -46,11 +52,6 @@ def ssh():
     subprocess.run(ssh, shell=True)
 
 
-# Read secret token needed to connect to API from untracked file.
-with open("hks_secret_token.txt", "r") as myfile:
-    hks_secret_token = myfile.read().replace('\n', '')
-
-
 def pull_engagement_data(course):
     """Downloads learner engagement data from EPoDx
 
@@ -71,7 +72,7 @@ def pull_engagement_data(course):
     course_id = "course-v1:epodx+BCURE-{}+2016_v1".format(course)
     learner_profile_report_url = "http://localhost:18100/api/v0/learners/"
     headers = {
-        "Authorization": "Token {}".format(hks_secret_token),
+        "Authorization": "Token {}".format(HKS_SECRET_TOKEN),
         "Accept": "text/csv",
     }
     # The list of fields you've requested.
