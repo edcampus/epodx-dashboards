@@ -69,7 +69,10 @@ def pull_engagement_data(course):
 
     """
     # Define parameters for extracting learner profile data.
-    course_id = "course-v1:epodx+BCURE-{}+2016_v1".format(course)
+    if course == "DTA":
+        course_id = "course-v1:epodx+BCURE-{}+2018_v1".format(course)
+    else:
+        course_id = "course-v1:epodx+BCURE-{}+2016_v1".format(course)
     learner_profile_report_url = "http://localhost:18100/api/v0/learners/"
     headers = {
         "Authorization": "Token {}".format(HKS_SECRET_TOKEN),
@@ -129,7 +132,7 @@ if __name__ == '__main__':
     print("Beginning to write engagement data to Dropbox (CID)"
           "/Training Assessment and Research/BCURE Learner Engagement Reports")
     ssh()
-    courses = ["AGG", "CBA", "COM", "DES", "IMP", "SYS"]
+    courses = ["AGG", "CBA", "COM", "DES", "DTA", "IMP", "SYS"]
     for course in courses:
         pull_engagement_data(course)
 
