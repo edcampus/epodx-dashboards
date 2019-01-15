@@ -38,6 +38,7 @@ cron_prep_time = 120
 # Allow job to execute up to two minutes after deferral time
 cron_window = 120
 
+# Note: This amount of memory is likely indicative of an unresolved bug
 # Request 32 GB (32,000 MB) of physical memory (RAM)
 request_memory  = 32000
 # Request one physical CPU core
