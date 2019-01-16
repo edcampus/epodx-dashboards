@@ -38,7 +38,7 @@ def ssh():
     """SSH tunnel to EPoDX API"""
     # Change to directory containing configuration files.
     home_dir = os.path.expanduser('~')
-    epodx_dir = os.path.join(home_dir, 'EPoD/epodx')
+    epodx_dir = os.path.join(home_dir, 'epodx')
     os.chdir(epodx_dir)
 
     # Establish SHH tunnel in background that auto-closes.
@@ -220,7 +220,7 @@ def tunnel_and_write_to_g_sheet(dashboard):
 
 if __name__ == '__main__':
     dashboards = [
-        ["CBA", "NSPP1"], ["DTA", "HKS"],
+        ["IMP", "LBSNAA"],
     ]
 
     for dashboard in dashboards:
