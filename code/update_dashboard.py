@@ -20,7 +20,6 @@ import time        # For calculating run time
 # Third-party imports
 import httplib2                  # "A comprehensive HTTP client library"
 import requests                  # "HTTP for Humans"
-# To install apiclient: 'pip install --upgrade google-api-python-client'
 from apiclient import discovery  # For acessing Google Sheets API
 
 # User-written imports

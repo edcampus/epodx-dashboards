@@ -13,7 +13,8 @@ https://console.developers.google.com/
 2. Select the EPoDx Data Dashboards project
 3. In the left-hand menu, select Credentials.
 4. Under OAuth 2.0 client IDs, click the download button on the far-right
-5. Save this file to the epodx-dashboards repo and rename it client_secret.json
+5. Save this file to the epodx-dashboards/code folder and rename it
+client_secret.json
 """
 
 from __future__ import print_function
