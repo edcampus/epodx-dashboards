@@ -90,7 +90,10 @@ def write_to_g_sheet(course, partner, data_selection='both'):
             problems - Only download problem responses
             profiles - Only download learner profiles
     """
-    course_id = "course-v1:epodx+BCURE-{}+2016_v1".format(course)
+    if course == "DTA":
+        course_id = "course-v1:epodx+BCURE-{}+2018_v1".format(course)
+    else:
+        course_id = "course-v1:epodx+BCURE-{}+2016_v1".format(course)
     spreadsheetId = secrets.PARTNER_SHEET_KEYS["{}_{}".format(course, partner)]
 
     if data_selection == "both":
@@ -217,7 +220,7 @@ def tunnel_and_write_to_g_sheet(dashboard):
 
 if __name__ == '__main__':
     dashboards = [
-        ["SYS", "NSPP1"],
+        ["CBA", "NSPP1"], ["DTA", "HKS"],
     ]
 
     for dashboard in dashboards:
