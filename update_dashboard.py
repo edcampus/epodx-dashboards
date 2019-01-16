@@ -58,7 +58,7 @@ def ssh():
     subprocess.run(command, shell=True)
 
 
-def write_to_g_sheet(course, data_selection='both', sheet_selection='primary'):
+def write_to_g_sheet(course, partner, data_selection='both'):
     """Downloads learner data from EPoDx and writes to Google Sheets.
 
     edX stores identifiable information about learners separately from
@@ -76,54 +76,23 @@ def write_to_g_sheet(course, data_selection='both', sheet_selection='primary'):
             IMP - Impact Evaluations
             SYS - Systematic Approaches to Policy Decisions
 
+        partner (str): Separate dashboards are required for each partner
+        because of the static nature of the dashboards means that a single
+        dashboard cannot be used by two different partners simultaneously.
+        Known values are:
+            HKS - Write to master sheet reserved for HKS trainings
+            LBSNAA - Write to master sheet reserved for LBSNAA trainings
+            NSPP1 - Write to 1st master sheet reserved for NSPP trainings
+            NSPP2 - Write to 2nd master sheet reserved for NSPP trainings
+
         data_selection (str): Specifies whether to download and write only
         learner profiles, only problem responses or both. Known values are:
             both - Download and write both learner profiles & problem responses
             problems - Only download problem responses
             profiles - Only download learner profiles
-
-        sheet_selection (str): For courses where there are multiple dashboards,
-        this specifies which dashboard to update. Multiple dashboards exist
-        becuase the instructor-facing Wix dashboards point to specific sheets
-        for each country. Known values are:
-            primary - Write to primary master sheet
-            LBSNAA - Write to master sheet reserved for LBSNAA trainings
-            NSPP - Write to master sheet reserved for NSPP trainings
-
     """
     course_id = "course-v1:epodx+BCURE-{}+2016_v1".format(course)
-    if course == "AGG":
-        spreadsheetId = "1uMAyKZYtoVLzqpknBxOGbkLjR7-AMqlEEowdFqSc3pw"
-
-    elif course == "COM":
-        spreadsheetId = "1z6xR_xspemndfyQ_hOoYKwBZAjEEA2nqItG__plOgmU"
-
-    elif course == "CBA":
-        spreadsheetId = "1-b-1r5CJIWEmGZ0R_vOVJLnmAvCntL88HXPle4XaiJ0"
-
-    elif course == "DES" and sheet_selection == "primary":
-        spreadsheetId = "1Yh3MQVz8AddovX1hKYNTwQ23C7OnDmJ9v0T39-lUvPU"
-
-    elif course == "DES" and sheet_selection == "LBSNAA":
-        spreadsheetId = "1tOJoX60NT4Zfmne8SkWuOND2-xIYMujf-0500kRxfog"
-
-    elif course == "IMP" and sheet_selection == "primary":
-        spreadsheetId = "1HUDWhXwr4Ekcs4lsqyGE6qoT4OsPaigH42zbsiY39NE"
-
-    elif course == "IMP" and sheet_selection == "LBSNAA":
-        spreadsheetId = "1HdbFZG9eunByuWE4KNkx9hmJ9HvxQitv7MuivZi8ouo"
-
-    elif course == "IMP" and sheet_selection == "NSPP":
-        spreadsheetId = "1ta5gB8AfZS9kFrG6NBXyjm_jKnM_7mRj7ddUowdnkog"
-
-    elif course == "SYS" and sheet_selection == "primary":
-        spreadsheetId = "1h_RW5_-BduGg9__3wO9HZj7A0ch0DAqY5IQrZlI9Ow4"
-
-    elif course == "SYS" and sheet_selection == "NSPP":
-        spreadsheetId = "1nGHJd2eFimM5JSGq3xB-2oIQHTkV_uH0wDgFHSQ-Pso"
-
-    else:
-        raise NameError("Arguments not recognized.")
+    spreadsheetId = secrets.PARTNER_SHEET_KEYS["{}_{}".format(course, partner)]
 
     if data_selection == "both":
         message_to_print = ("Downloading and writing {} learner profiles and "
@@ -187,7 +156,6 @@ def write_to_g_sheet(course, data_selection='both', sheet_selection='primary'):
                             )
         print(message_to_print)
 
-    # TODO: Break into separate function
     # This section builds on Google quickstart template.
     # https://developers.google.com/sheets/api/quickstart/python
     credentials = get_credentials()
@@ -235,36 +203,22 @@ def tunnel_and_write_to_g_sheet(dashboard):
     """Establish SSH tunnel, download data, and write to Google Sheet"""
     ssh()
     course = dashboard[0]
-    if len(dashboard) == 1:
-        write_to_g_sheet(course)
-        message_to_print = ("Upload profiles and problems to {} primary "
-                            "master sheet complete".format(course)
-                            )
-        print(message_to_print)
-
+    partner = dashboard[1]
+    if "profiles" in dashboard:
+        data_selection = "profiles"
+    elif "problems" in dashboard:
+        data_selection = "problems"
     else:
-        if "profiles" in dashboard:
-            data_selection = "profiles"
-        elif "problems" in dashboard:
-            data_selection = "problems"
-        else:
-            data_selection = "both"
+        data_selection = "both"
 
-        if "LBSNAA" in dashboard:
-            sheet_selection = "LBSNAA"
-        if "NSPP" in dashboard:
-            sheet_selection = "NSPP"
-        else:
-            sheet_selection = "primary"
-
-        write_to_g_sheet(course, data_selection, sheet_selection)
-        print("Upload {} to {} {} master sheet complete".format(
-            data_selection, course, sheet_selection))
+    write_to_g_sheet(course, partner, data_selection)
+    print("Upload {} to {} {} master sheet complete".format(
+        data_selection, course, partner))
 
 
 if __name__ == '__main__':
     dashboards = [
-        ["SYS", "problems", "NSPP"], ["IMP", "problems", "NSPP"],
+        ["SYS", "NSPP1"],
     ]
 
     for dashboard in dashboards:
